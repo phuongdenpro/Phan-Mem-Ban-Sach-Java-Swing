@@ -1,0 +1,5 @@
+USE master;
+GO
+ALTER DATABASE HieuSach SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+GO
+drop database HieuSach;

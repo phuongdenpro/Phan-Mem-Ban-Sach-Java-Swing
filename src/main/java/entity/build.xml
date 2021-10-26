@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="build">
+	<path id="build.classpath">
+		<pathelement location="classes"/>
+	</path>
+	<target name="init">
+		<mkdir dir="classes"/>
+	</target>
+	<target name="clean">
+		<delete dir="classes"/>
+	</target>
+	<target depends="init" name="build">
+		<javac srcdir="." destdir="classes" source="1.5" target="1.5" fork="yes">
+			<classpath refid="build.classpath"/>
+			<include name="LoaiSanPham.java"/>
+			<include name="ChiTietDonDatHang.java"/>
+			<include name="DonDatHang.java"/>
+			<include name="KhachHang.java"/>
+			<include name="TaiKhoan.java"/>
+			<include name="NhanVienQLSanPham.java"/>
+			<include name="QuanLy.java"/>
+			<include name="NhanVien.java"/>
+			<include name="NhanVienBanHang.java"/>
+			<include name="HoaDon.java"/>
+			<include name="ChiTietHoaDon.java"/>
+			<include name="SanPham.java"/>
+			<include name="NhaCungCap.java"/>
+		</javac>
+	</target>
+</project>

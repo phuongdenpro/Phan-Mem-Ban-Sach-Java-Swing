@@ -1,4 +1,4 @@
-package GUI;
+package gui;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
@@ -8,10 +8,14 @@ import javax.swing.JPanel;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
 import org.jdesktop.swingx.prompt.PromptSupport;
 
+import dao.KhachHangDAO;
+import entity.KhachHang;
 import util.Placeholder;
 
 import javax.swing.BoxLayout;
@@ -22,7 +26,13 @@ import javax.swing.JButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.awt.FlowLayout;
 import java.awt.Dimension;
 import java.awt.Color;
@@ -40,12 +50,13 @@ public class KhachHang_GUI extends JFrame {
 	private JPanel contentPane;
 	private JPanel out;
 	private JTextField txtNhapLieu;
-	private JTable table;
-	private JTextField txtMaKh;
-	private JTextField txtTenKh;
-	private JTextField txtEmail;
-	private JTextField txtSdt;
-	private JTextField txtDiaChi;
+	private JTable tblKhachHang;
+	private JTextField txtMaKh,txtTenKh,txtSdt,txtDiaChi;
+	private DefaultTableModel modelDSKH;
+	private JButton btnLamMoi,btnXoaKh,btnSuaKh,btnTimKiem;
+	private DefaultComboBoxModel cboLoaiTimKiem;
+	private JComboBox cmbLoaiTimKiem;
+	ArrayList<KhachHang> dskh ;
 
 	/**
 	 * Launch the application.
@@ -65,8 +76,9 @@ public class KhachHang_GUI extends JFrame {
 
 	/**
 	 * Create the frame.
+	 * @throws SQLException 
 	 */
-	public KhachHang_GUI() {
+	public KhachHang_GUI() throws SQLException {
 		setTitle("Khách hàng");
 		setResizable(false);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -147,25 +159,7 @@ public class KhachHang_GUI extends JFrame {
 		txtTenKh = new JTextField();
 		txtTenKh.setPreferredSize(new Dimension(7, 30));
 		txtTenKh.setColumns(20);
-		//PromptSupport.setPrompt("tên khách hàng", txtTenKh);
-		new Placeholder().placeholder(txtTenKh, "tên khách hàng");
 		pnTenKh.add(txtTenKh);
-		
-		JPanel pnEmail = new JPanel();
-		FlowLayout fl_pnEmail = (FlowLayout) pnEmail.getLayout();
-		fl_pnEmail.setAlignment(FlowLayout.LEFT);
-		pnThongTinKh.add(pnEmail);
-		
-		JLabel lblEmail = new JLabel("Email");
-		lblEmail.setPreferredSize(new Dimension(100, 14));
-		pnEmail.add(lblEmail);
-		
-		txtEmail = new JTextField();
-		txtEmail.setPreferredSize(new Dimension(7, 30));
-		txtEmail.setColumns(20);
-		//PromptSupport.setPrompt("Example@gmail.com", txtEmail);
-		new Placeholder().placeholder(txtEmail, "Example@gmail.com");
-		pnEmail.add(txtEmail);
 		
 		JPanel pnSoDienThoai = new JPanel();
 		FlowLayout fl_pnSoDienThoai = (FlowLayout) pnSoDienThoai.getLayout();
@@ -179,8 +173,6 @@ public class KhachHang_GUI extends JFrame {
 		txtSdt = new JTextField();
 		txtSdt.setPreferredSize(new Dimension(7, 30));
 		txtSdt.setColumns(20);
-		//PromptSupport.setPrompt("09xx xxx xxx ", txtSdt);
-		new Placeholder().placeholder(txtSdt, "09xx xxx xxx");
 		pnSoDienThoai.add(txtSdt);
 		
 		JPanel pnDiaChi = new JPanel();
@@ -195,8 +187,6 @@ public class KhachHang_GUI extends JFrame {
 		txtDiaChi = new JTextField();
 		txtDiaChi.setPreferredSize(new Dimension(7, 30));
 		txtDiaChi.setColumns(20);
-		//PromptSupport.setPrompt("Số nhà, tên đường, tỉnh thành", txtDiaChi);
-		new Placeholder().placeholder(txtDiaChi, "Số nhà, tên đường, tỉnh thành");
 		pnDiaChi.add(txtDiaChi);
 		
 		Component verticalStrut = Box.createVerticalStrut(20);
@@ -204,29 +194,21 @@ public class KhachHang_GUI extends JFrame {
 		
 		JPanel pnChucNang = new JPanel();
 		pnThongTinKh.add(pnChucNang);
-		pnChucNang.setLayout(new GridLayout(2, 0, 5, 5));
+		pnChucNang.setLayout(new GridLayout(0, 1, 0, 5));
 		
-		JButton btnThemKh = new JButton("Thêm");
-		btnThemKh.setBackground(Color.WHITE);
-		btnThemKh.setPreferredSize(new Dimension(70, 35));
-		btnThemKh.setIcon(new ImageIcon("data\\images\\blueAdd_16.png"));
-		btnThemKh.setIconTextGap(10);
-		out.getRootPane().setDefaultButton(btnThemKh);
-		pnChucNang.add(btnThemKh);
-		
-		JButton btnSuaKh = new JButton("Sửa");
+		btnSuaKh = new JButton("Sửa");
 		btnSuaKh.setBackground(Color.WHITE);
 		btnSuaKh.setIcon(new ImageIcon("data\\images\\repairing-service.png"));
 		btnSuaKh.setIconTextGap(30);
 		pnChucNang.add(btnSuaKh);
 		
-		JButton btnXoaKh = new JButton("Xóa");
+		btnXoaKh = new JButton("Xóa");
 		btnXoaKh.setBackground(Color.WHITE);
 		btnXoaKh.setIcon(new ImageIcon("data\\images\\trash.png"));
 		btnXoaKh.setIconTextGap(10);
 		pnChucNang.add(btnXoaKh);
 		
-		JButton btnLamMoi = new JButton("Làm mới");
+		btnLamMoi = new JButton("Làm mới");
 		btnLamMoi.setBackground(Color.WHITE);
 		btnLamMoi.setIcon(new ImageIcon("data\\images\\refresh.png"));
 		btnLamMoi.setIconTextGap(10);
@@ -240,26 +222,24 @@ public class KhachHang_GUI extends JFrame {
 		pnTimKiem.setBorder(new CompoundBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null), new BevelBorder(BevelBorder.LOWERED, null, null, null, null)));
 		pnRight.add(pnTimKiem, BorderLayout.NORTH);
 
-		DefaultComboBoxModel cboLoaiTimKiem = new DefaultComboBoxModel<String>();
-		JComboBox cmbLoaiTimKiem = new JComboBox(cboLoaiTimKiem);
+		cboLoaiTimKiem = new DefaultComboBoxModel<String>();
+		cmbLoaiTimKiem = new JComboBox(cboLoaiTimKiem);
 		cmbLoaiTimKiem.setToolTipText("tìm kiếm theo");
 		cmbLoaiTimKiem.setBackground(Color.WHITE);
 		cmbLoaiTimKiem.setPreferredSize(new Dimension(130, 22));
 		pnTimKiem.add(cmbLoaiTimKiem);
-		cboLoaiTimKiem.addElement((String) "Mã KH");
 		cboLoaiTimKiem.addElement((String) "Tên KH");
 		cboLoaiTimKiem.addElement((String) "Số điện thoại");
-		
+		cboLoaiTimKiem.addElement((String) "Địa chỉ");
 		
 		
 		txtNhapLieu = new JTextField();
 		txtNhapLieu.setPreferredSize(new Dimension(7, 25));
 		pnTimKiem.add(txtNhapLieu);
-		//PromptSupport.setPrompt("nhập liệu tìm kiếm", txtNhapLieu);
 		new Placeholder().placeholder(txtNhapLieu, "nhập liệu tìm kiếm");
 		txtNhapLieu.setColumns(30);
 		
-		JButton btnTimKiem = new JButton("Tìm kiếm");
+		btnTimKiem = new JButton("Tìm kiếm");
 		btnTimKiem.setPreferredSize(new Dimension(130, 25));
 		btnTimKiem.setBackground(Color.WHITE);
 		btnTimKiem.setIcon(new ImageIcon("data\\images\\search_16.png"));
@@ -269,19 +249,224 @@ public class KhachHang_GUI extends JFrame {
 		pnRight.add(pnTableKh, BorderLayout.CENTER);
 		pnTableKh.setLayout(new BorderLayout(0, 0));
 		
-		String[] cols_dskh = {"Mã khách hàng", "Tên khách hàng", "Số điện thoại", "Email", "Địa chỉ"};
-		DefaultTableModel modelDSKH = new DefaultTableModel(cols_dskh, 0);
-		table = new JTable(modelDSKH);
-		JScrollPane scrTableKhachhang = new JScrollPane(table);
+		String[] cols_dskh = {"Mã khách hàng", "Tên khách hàng", "Số điện thoại", "Địa chỉ","Tài khoản"};
+		modelDSKH = new DefaultTableModel(cols_dskh, 0);
+		tblKhachHang = new JTable(modelDSKH);
+		JScrollPane scrTableKhachhang = new JScrollPane(tblKhachHang);
 		scrTableKhachhang.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		scrTableKhachhang.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 		pnTableKh.add(scrTableKhachhang);
 		
-		modelDSKH.addRow(new Object[]{"1", "Tran Van Nhan", "0987654321", "tranvannhan@gmail.com", "Thủ Đức, Hồ Chí Minh"});
+		//modelDSKH.addRow(new Object[]{"1", "Tran Van Nhan", "0987654321", "tranvannhan@gmail.com", "Thủ Đức, Hồ Chí Minh"});
 		
+		renderData();
+		addEvents();
 		
 	}
+	
+	private void addEvents() {
+		// TODO Auto-generated method stub
+		setDisable();
+		
+		tblKhachHang.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+			
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				// TODO Auto-generated method stub
+				int index = tblKhachHang.getSelectedRow();
+				if(index == -1 && txtTenKh.getText().equals("")) {
+					setDisable();
+				}
+					
+				if(index != -1) {
+					setEnable();
+					
+					KhachHang kh = dskh.get(index);
+					txtMaKh.setText(String.valueOf(kh.getMaKh()));
+					txtTenKh.setText(kh.getHoTen());
+					txtSdt.setText(kh.getSoDienThoai());	
+					txtDiaChi.setText(kh.getDiaChi()); 
+					
+				}
+			}
+		});
+		
+		btnLamMoi.addActionListener(new ActionListener(){
 
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				txtMaKh.setText("");
+				txtTenKh.setText("");
+				txtSdt.setText("");
+				txtDiaChi.setText("");
+				try {
+					renderData();
+				} catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					
+					e1.printStackTrace();
+				}
+			}});
+		
+		
+
+		btnSuaKh.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				tblKhachHang.clearSelection();
+					
+				int makh = Integer.parseInt( txtMaKh.getText());
+				String tenKh = txtTenKh.getText();
+				String sdt = txtSdt.getText();
+				String diaChi = txtDiaChi.getText();
+				
+				if(tenKh.equals("")|| kiemTraSo(tenKh)) {
+					JOptionPane.showMessageDialog(contentPane, "Tên không hợp lệ");
+					return;
+				}
+				//boolean ktTen = tenKh.ma
+				boolean ktSdt  = sdt.matches("^(0?)(3[2-9]|5[6|8|9]|7[0|6-9]|8[0-6|8|9]|9[0-4|6-9])[0-9]{7}$");			
+				if (ktSdt == false) {
+					JOptionPane.showMessageDialog(contentPane, "Sai định dạng số điện thoại");
+					return;	
+				}
+				
+				KhachHang kh = new KhachHang(tenKh, sdt, diaChi);
+				boolean kq; 
+				try {
+					kq = new KhachHangDAO().suaKH(kh,makh);
+					if(kq) {
+						JOptionPane.showMessageDialog(contentPane, "Sửa thành công");
+						renderData();
+					}	
+					else 
+						JOptionPane.showMessageDialog(contentPane, "Có lỗi xảy ra");
+				}catch (Exception ex) {
+					ex.printStackTrace();
+				}
+					lamMoi();
+					setDisable();
+			}});
+		btnXoaKh.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				int index = tblKhachHang.getSelectedRow();
+				if(index!= -1) {
+					int choose = JOptionPane.showConfirmDialog(contentPane, 
+							"chắc chắn xóa", "xác nhận", JOptionPane.YES_NO_OPTION);
+					if (choose == 0) {
+						tblKhachHang.clearSelection();
+						boolean kq;
+						try {
+							kq = new KhachHangDAO().xoaKhachHang(dskh.get(index));
+							System.out.println(kq);
+							if(kq) {
+								JOptionPane.showMessageDialog(contentPane, "xóa thành công");
+								renderData();
+								lamMoi();
+								setDisable();
+								return;
+							}else {
+								JOptionPane.showMessageDialog(contentPane, "không thể xóa khách hàng này");
+								return;
+							}
+							
+						}catch(Exception ex) {
+							ex.printStackTrace();
+						}
+					}			
+				}
+				
+			}});
+		
+		
+		btnTimKiem.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				if(txtNhapLieu.getText().equals("")) {
+					JOptionPane.showMessageDialog(contentPane,"cần nhập dữ liệu tìm kiếm");
+					return;
+				}
+				String key = "";
+					
+				if(cboLoaiTimKiem.getSelectedItem().equals("Tên KH")) 
+					key = "HoTen";							
+				else if(cboLoaiTimKiem.getSelectedItem().equals("Số điện thoại")) 
+					key = "SoDienThoai";		
+				else if(cboLoaiTimKiem.getSelectedItem().equals("Địa chỉ")) 
+					key = "DiaChi";
+				String sql = " "+ key + " like " + "N'%" +txtNhapLieu.getText()+ "%'" ;
+				System.out.println(sql);
+				dskh = new ArrayList<KhachHang>();
+				try {
+					dskh = new KhachHangDAO().TimKiem(sql);
+					renderDataTimKiem(dskh);
+					if(dskh.size() == 0) {
+						JOptionPane.showMessageDialog(contentPane, "Không tìm thấy khách hàng nào");
+					}
+					
+				} catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				
+			}});
+	}
+
+	public void renderData() throws SQLException {
+		modelDSKH.setRowCount(0);
+		dskh = new ArrayList<KhachHang>();
+		dskh = new KhachHangDAO().getListKhachHang();
+		for (KhachHang kh: dskh) {
+			System.out.println(kh.toString());
+			modelDSKH.addRow(new Object[] {kh.getMaKh(),kh.getHoTen(),kh.getSoDienThoai(),kh.getDiaChi(),kh.getTenTk()});
+		}
+		tblKhachHang.revalidate();
+		tblKhachHang.repaint();
+	}
+	public void renderDataTimKiem(ArrayList<KhachHang> dskh) throws SQLException {
+		tblKhachHang.clearSelection();
+
+		modelDSKH.getDataVector().removeAllElements();
+
+		dskh.forEach(kh -> {
+			modelDSKH.addRow(new Object[] { kh.getMaKh(),kh.getHoTen(),kh.getSoDienThoai(),kh.getDiaChi(),kh.getTenTk()});
+		});
+
+		tblKhachHang.revalidate();
+		tblKhachHang.repaint();
+	}
+	public void lamMoi() {
+		txtMaKh.setText("");
+		txtTenKh.setText("");
+		txtSdt.setText("");
+		txtDiaChi.setText("");
+	}
+	public void setDisable() {
+		btnSuaKh.setEnabled(false);
+		btnXoaKh.setEnabled(false);
+	}
+	public void setEnable() {
+		btnSuaKh.setEnabled(true);
+		btnXoaKh.setEnabled(true);
+	}
+	public boolean kiemTraSo(String ten) {
+		char arrTen[] = ten.toCharArray();
+		String cTen;
+		for(int i=0;i<ten.length();i++) {
+			cTen = String.valueOf(arrTen[i]);
+			if(cTen.matches("[0-9]"))
+				return true;
+		}
+		return false;
+	}
 	public JPanel getContentPane() {
 		 return this.contentPane;
 	 }

@@ -4,11 +4,35 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import dao.DonDatHangDAO;
+import dao.KhachHangDAO;
+
 public class KhachHang {
 	private int maKh;
 	private String hoTen;
 	private String soDienThoai;
 	private String diaChi;
+	private int maTk;
+	private String tenTk;
+	
+	
+	
+	public String getTenTk() {
+		return tenTk;
+	}
+
+	public void setTenTk(String tenTk) {
+		this.tenTk = tenTk;
+	}
+
+	public int getMaTk() {
+		return maTk;
+	}
+
+	public void setMaTk(int maTk) {
+		this.maTk = maTk;
+	}
+
 	public ArrayList<HoaDon> hoaDons = new ArrayList<HoaDon>();
 	public TaiKhoan taiKhoan;
 	public ArrayList<DonDatHang> donDatHangs = new ArrayList<DonDatHang>();
@@ -30,18 +54,41 @@ public class KhachHang {
 		this.soDienThoai = soDienThoai;
 		this.diaChi = diaChi;
 	}
+	public KhachHang(int maKh,String hoTen, String soDienThoai, String diaChi) {
+		this.maKh = maKh;
+		this.hoTen = hoTen;
+		this.soDienThoai = soDienThoai;
+		this.diaChi = diaChi;
+	}
 	
 	public KhachHang(ResultSet rs) throws SQLException {
 		try {
-			this.maKh = rs.getInt("maKH");
+			this.maKh = rs.getInt("MaKH");
 		}catch (Exception e) {
 			
 		}
-		this.hoTen = rs.getString("hoTen");
-		this.soDienThoai = rs.getString("soDienThoai");
-		this.diaChi = rs.getString("diaChi");
-	}
-
+		try {
+			this.hoTen = rs.getString("HoTen");
+			this.soDienThoai = rs.getString("SoDienThoai");
+			this.diaChi = rs.getString("DiaChi");
+			this.maTk = rs.getInt("TaiKhoanID");
+			this.tenTk = rs.getString("TaiKhoan");
+			
+		}catch (Exception e) {
+			KhachHang tmp = new KhachHangDAO().getKhachHang(this.maKh);
+			this.hoTen = tmp.getHoTen();
+			this.soDienThoai = tmp.getSoDienThoai();
+			this.diaChi = tmp.getDiaChi();
+			try {
+				this.maTk = tmp.getTaiKhoan().getId();
+				this.tenTk = tmp.getTaiKhoan().getTaiKhoan();
+			}catch(Exception ex) {
+				//ex.printStackTrace();
+			}
+			
+			}
+		}
+	
 	public int getMaKh() {
 		return maKh;
 	}

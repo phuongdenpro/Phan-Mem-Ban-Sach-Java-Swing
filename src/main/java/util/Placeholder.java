@@ -10,6 +10,7 @@ import javax.swing.JTextField;
 public class Placeholder {
 	
 	public void placeholder(JTextField txtField, String placeholder) {
+		txtField.setText(placeholder);
 		txtField.setForeground(Color.GRAY);
 		txtField.addFocusListener(new FocusListener() {
 		    @Override
@@ -30,6 +31,7 @@ public class Placeholder {
 	}
 	
 	public void placeholder(JPasswordField txtField, String placeholder) {
+		txtField.setText(placeholder);
 		txtField.setForeground(Color.GRAY);
 		txtField.addFocusListener(new FocusListener() {
 		    @Override
@@ -50,4 +52,7 @@ public class Placeholder {
 		    }
 	    });
 	}
+
+
+	
 }

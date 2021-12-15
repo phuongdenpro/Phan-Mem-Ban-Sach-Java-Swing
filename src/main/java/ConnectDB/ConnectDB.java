@@ -1,4 +1,4 @@
-package ConnectDB;
+package connectdb;
 
 import java.sql.*;
 
@@ -9,7 +9,7 @@ public class ConnectDB {
         String severName = "localhost";
         String databaseName = "HieuSach";
         String username = "sa";
-        String password = "sa";
+        String password = "sapassword";
         String url = "jdbc:sqlserver://" + severName + ":1433;databaseName=" + databaseName;
         this.conn = DriverManager.getConnection(url, username, password);
         System.out.println(conn);

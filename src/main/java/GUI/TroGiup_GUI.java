@@ -1,4 +1,4 @@
-package GUI;
+package gui;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
@@ -32,7 +32,7 @@ public class TroGiup_GUI extends JFrame {
 
 	private JPanel contentPane;
 	private JPanel pnContent;
-	private JPanel panel_2;
+	private JPanel pnRight;
 	public JButton btnTroVe;
 
 	/**
@@ -72,41 +72,41 @@ public class TroGiup_GUI extends JFrame {
 		gbl_panel.rowWeights = new double[]{1.0};
 		panel.setLayout(gbl_panel);
 		
-		JPanel panel_1 = new JPanel();
-		panel_1.setBorder(new LineBorder(new Color(0, 0, 0)));
-		panel_1.setBackground(Color.WHITE);
-		GridBagConstraints gbc_panel_1 = new GridBagConstraints();
-		gbc_panel_1.insets = new Insets(0, 0, 0, 5);
-		gbc_panel_1.fill = GridBagConstraints.BOTH;
-		gbc_panel_1.gridx = 0;
-		gbc_panel_1.gridy = 0;
-		panel.add(panel_1, gbc_panel_1);
+		JPanel pnLeft = new JPanel();
+		pnLeft.setBorder(new LineBorder(new Color(0, 0, 0)));
+		pnLeft.setBackground(Color.WHITE);
+		GridBagConstraints gbc_pnLeft = new GridBagConstraints();
+		gbc_pnLeft.insets = new Insets(0, 0, 0, 5);
+		gbc_pnLeft.fill = GridBagConstraints.BOTH;
+		gbc_pnLeft.gridx = 0;
+		gbc_pnLeft.gridy = 0;
+		panel.add(pnLeft, gbc_pnLeft);
 		
-		JPanel panel_3 = new JPanel();
-		panel_3.setBackground(Color.WHITE);
-		panel_3.setPreferredSize(new Dimension(280, 200));
-		panel_1.add(panel_3);
-		panel_3.setLayout(new BorderLayout(0, 0));
+		JPanel pnDanhSachCauHoi = new JPanel();
+		pnDanhSachCauHoi.setBackground(Color.WHITE);
+		pnDanhSachCauHoi.setPreferredSize(new Dimension(280, 200));
+		pnLeft.add(pnDanhSachCauHoi);
+		pnDanhSachCauHoi.setLayout(new BorderLayout(0, 0));
 		
-		JPanel panel_4 = new JPanel();
-		panel_4.setBackground(Color.WHITE);
-		panel_3.add(panel_4, BorderLayout.NORTH);
+		JPanel pnTroGiup = new JPanel();
+		pnTroGiup.setBackground(Color.WHITE);
+		pnDanhSachCauHoi.add(pnTroGiup, BorderLayout.NORTH);
 		
-		JLabel lblNewLabel = new JLabel("Trợ giúp");
-		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 30));
-		panel_4.add(lblNewLabel);
+		JLabel lblTroGiup = new JLabel("Trợ giúp");
+		lblTroGiup.setHorizontalAlignment(SwingConstants.CENTER);
+		lblTroGiup.setFont(new Font("Tahoma", Font.PLAIN, 30));
+		pnTroGiup.add(lblTroGiup);
 		
-		JPanel panel_5 = new JPanel();
-		panel_5.setBorder(new EmptyBorder(0, 10, 0, 0));
-		panel_5.setBackground(Color.WHITE);
-		panel_3.add(panel_5);
-		panel_5.setLayout(new GridLayout(0, 1, 0, 0));
+		JPanel pnCauHoi = new JPanel();
+		pnCauHoi.setBorder(new EmptyBorder(0, 10, 0, 0));
+		pnCauHoi.setBackground(Color.WHITE);
+		pnDanhSachCauHoi.add(pnCauHoi);
+		pnCauHoi.setLayout(new GridLayout(0, 1, 0, 0));
 		
 		btnTroVe = new JButton("Trở về");
 		btnTroVe.setPreferredSize(new Dimension(200, 23));
 		btnTroVe.setBackground(Color.WHITE);
-		panel_3.add(btnTroVe, BorderLayout.SOUTH);
+		pnDanhSachCauHoi.add(btnTroVe, BorderLayout.SOUTH);
 		
 		List<JLabel> lblDanhSachCauHoi = new ArrayList<JLabel>();
 		
@@ -116,20 +116,20 @@ public class TroGiup_GUI extends JFrame {
 		lblDanhSachCauHoi.add(new JLabel("4. Cách đi vào trang quản lý ?"));
 		
 		lblDanhSachCauHoi.forEach(lbl -> {
-			panel_5.add(lbl);
+			pnCauHoi.add(lbl);
 		});
 		
-		panel_2 = new JPanel();
-		GridBagConstraints gbc_panel_2 = new GridBagConstraints();
-		gbc_panel_2.fill = GridBagConstraints.BOTH;
-		gbc_panel_2.gridx = 1;
-		gbc_panel_2.gridy = 0;
-		panel.add(panel_2, gbc_panel_2);
-		panel_2.setLayout(new GridLayout(0, 1, 0, 0));
+		pnRight = new JPanel();
+		GridBagConstraints gbc_pnRight = new GridBagConstraints();
+		gbc_pnRight.fill = GridBagConstraints.BOTH;
+		gbc_pnRight.gridx = 1;
+		gbc_pnRight.gridy = 0;
+		panel.add(pnRight, gbc_pnRight);
+		pnRight.setLayout(new GridLayout(0, 1, 0, 0));
 		
 		
 		pnContent = this.troGiup4();
-		panel_2.add(pnContent);
+		pnRight.add(pnContent);
 		
 		List<JPanel> pnTraLoi = new ArrayList<JPanel>();
 		pnTraLoi.add(troGiup1());
@@ -155,15 +155,15 @@ public class TroGiup_GUI extends JFrame {
 				@Override
 				public void mouseClicked(MouseEvent e) {
 					
-					panel_2.remove(pnContent);
-					panel_2.revalidate();
-					panel_2.repaint();
+					pnRight.remove(pnContent);
+					pnRight.revalidate();
+					pnRight.repaint();
 					int id = Integer.parseInt(((JLabel)e.getSource()).getText().substring(0, 1)) - 1;
 					System.out.println(id);
 					pnContent = pnTraLoi.get(id);
-					panel_2.add(pnContent);
-					panel_2.revalidate();
-					panel_2.repaint();
+					pnRight.add(pnContent);
+					pnRight.revalidate();
+					pnRight.repaint();
 				}
 
 				@Override
@@ -283,31 +283,31 @@ public class TroGiup_GUI extends JFrame {
 	}
 
 	private JPanel troGiup4() {
-		JPanel panel_6 = new JPanel();
-		panel_6.setBorder(new LineBorder(new Color(0, 0, 0)));
-		panel_6.setLayout(new BorderLayout(0, 0));
+		JPanel pnNoiDung = new JPanel();
+		pnNoiDung.setBorder(new LineBorder(new Color(0, 0, 0)));
+		pnNoiDung.setLayout(new BorderLayout(0, 0));
 		
-		JPanel panel_7 = new JPanel();
-		panel_6.add(panel_7, BorderLayout.NORTH);
+		JPanel pnTieuDe = new JPanel();
+		pnNoiDung.add(pnTieuDe, BorderLayout.NORTH);
 		
-		JLabel lblNewLabel_5 = new JLabel("Cách đi tới trang quản lý ?");
-		lblNewLabel_5.setFont(new Font("Tahoma", Font.PLAIN, 30));
-		panel_7.add(lblNewLabel_5);
+		JLabel lblTieuDe = new JLabel("Cách đi tới trang quản lý ?");
+		lblTieuDe.setFont(new Font("Tahoma", Font.PLAIN, 30));
+		pnTieuDe.add(lblTieuDe);
 		
-		JPanel panel_8 = new JPanel();
-		panel_8.setBorder(new EmptyBorder(0, 10, 0, 0));
-		panel_6.add(panel_8, BorderLayout.CENTER);
-		panel_8.setLayout(new BoxLayout(panel_8, BoxLayout.Y_AXIS));
+		JPanel pnCauTraLoi = new JPanel();
+		pnCauTraLoi.setBorder(new EmptyBorder(0, 10, 0, 0));
+		pnNoiDung.add(pnCauTraLoi, BorderLayout.CENTER);
+		pnCauTraLoi.setLayout(new BoxLayout(pnCauTraLoi, BoxLayout.Y_AXIS));
 		
 		JLabel lblNewLabel_6 = new JLabel("1. Bấm vào nút \"Xin chào: <Tên bạn>\" trên thanh menu.");
 		lblNewLabel_6.setFont(new Font("Tahoma", Font.PLAIN, 15));
-		panel_8.add(lblNewLabel_6);
+		pnCauTraLoi.add(lblNewLabel_6);
 		
 		JLabel lblNewLabel_6_1 = new JLabel("2. Bấm nút \"đi tới trang quản lý\".");
 		lblNewLabel_6_1.setFont(new Font("Tahoma", Font.PLAIN, 15));
-		panel_8.add(lblNewLabel_6_1);
+		pnCauTraLoi.add(lblNewLabel_6_1);
 		
-		return panel_6;
+		return pnNoiDung;
 	}
 	
 	public JPanel getContenPane() {

@@ -19,6 +19,10 @@ public class TaiKhoan {
 		this.nhanVien = nhanVien;
 	}
 	
+	public TaiKhoan(int id) {
+		this.id = id;
+	}
+	
 	public TaiKhoan(ResultSet rs) throws SQLException {
 		this.id = rs.getInt("id");
 		this.taiKhoan = rs.getString("taiKhoan");

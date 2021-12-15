@@ -1,4 +1,4 @@
-package DAO;
+package dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -6,7 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import ConnectDB.ConnectDB;
+import connectdb.ConnectDB;
 import entity.KhachHang;
 import entity.NhanVien;
 import entity.SanPham;
@@ -30,7 +30,7 @@ public class TaiKhoanDAO extends ConnectDB{
             ResultSet rs = stmt.executeQuery();
             if(!rs.next())
                 return null;
-            printResultSet(rs);
+//            printResultSet(rs);
             matKhau = rs.getString("matKhau");
 //                
         } catch (SQLException e) {
@@ -66,7 +66,7 @@ public class TaiKhoanDAO extends ConnectDB{
             if(n == 0)
                 return false;
             
-            System.out.println(getLatestID());
+//            System.out.println(getLatestID());
             
             KhachHangDAO khachHangDao = new KhachHangDAO();
             if(!khachHangDao.themKhachHang(kh, getLatestID())) 
@@ -76,11 +76,45 @@ public class TaiKhoanDAO extends ConnectDB{
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            try {
-                stmt.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+        }
+        return false;		
+	}
+	
+//	thêm tài khoản mới cho nhân viên
+	public boolean themTaiKhoan(NhanVien nv, String taiKhoan, String matKhau) {
+		PreparedStatement stmt = null;
+        try {
+        	String sql = "SELECT id from dbo.TaiKhoan WHERE TaiKhoan = ?";
+            stmt = this.conn.prepareStatement(sql);
+            stmt.setString(1, taiKhoan);
+            ResultSet rs = stmt.executeQuery();
+        	if(rs.next()) {
+        		return false;
+        	}
+
+            sql = "INSERT INTO dbo.TaiKhoan (taiKhoan, matKhau) values(?, ?)";
+            stmt = this.conn.prepareStatement(sql);
+            stmt.setString(1, taiKhoan);
+            stmt.setString(2, matKhau);
+            int n = stmt.executeUpdate();
+//            
+            if(n == 0)
+                return false;
+            
+//            System.out.println(getLatestID());
+            
+            if(!new NhanVienDAO().themNhanVien(nv, getLatestID())) 
+            	return false;
+            
+            KhachHang kh = new KhachHang(nv.getTenNv(), nv.getSoDienThoai(), nv.getDiaChi());
+            
+            if(!new KhachHangDAO().themKhachHang(kh, getLatestID())) 
+            	return false;
+//                
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
         }
         return false;		
 	}
@@ -137,6 +171,8 @@ public class TaiKhoanDAO extends ConnectDB{
         return null;
     }
     
+    //lấy tài khoản từ mã tài khoản
+    
 //    từ tài khoản -> trả về nhân viên hoặc Khách hàng
     public Object getNguoiDung(String taiKhoan) {
     	PreparedStatement stmt = null;
@@ -171,6 +207,57 @@ public class TaiKhoanDAO extends ConnectDB{
         }
         
         return null;
+    }
+    
+//	public int getTaiKhoanID(int maNV) {
+//		PreparedStatement stmt = null;
+//		try {
+//			
+//			
+//		    String sql = "SELECT taiKhoanID FROM NhanVien where maNV = ?";
+//		    stmt = this.conn.prepareStatement(sql);
+//		    
+//		    stmt.setInt(1, maNV);
+//		    
+//		    int n = stmt.executeUpdate();
+//		    
+//		    if(n == 0) {
+//		    	return false;
+//		    }
+//		    
+//		    // xoas tai khoan
+//		    xoaTaiKhoan()
+//		    return n > 0;
+//		} catch (SQLException e) {
+//		    e.printStackTrace();
+//		} finally {
+//		    try {
+//		        stmt.close();
+//		    } catch (SQLException e) {
+//		        e.printStackTrace();
+//		    }
+//		}
+//		return false;
+//	}
+    
+    public boolean xoaTaiKhoan(int id) {
+    	PreparedStatement stmt = null;
+        try {
+
+            String sql = "DELETE FROM dbo.TaiKhoan where id = ?";
+            stmt = this.conn.prepareStatement(sql);
+            stmt.setInt(1, id);
+            
+            int n = stmt.executeUpdate();
+            
+            return n > 0; 
+        } catch (SQLException e) {
+//            e.printStackTrace();
+        } finally {
+            
+        }
+        
+        return false;
     }
 	
 	public static void main(String[] args) throws SQLException {

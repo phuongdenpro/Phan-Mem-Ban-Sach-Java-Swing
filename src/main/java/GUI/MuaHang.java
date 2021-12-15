@@ -1,4 +1,4 @@
-package GUI;
+package gui;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
@@ -11,33 +11,55 @@ import java.awt.event.WindowEvent;
 import java.sql.SQLException;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import dao.DonDatHangDAO;
+import dao.KhachHangDAO;
 import entity.KhachHang;
 
 
 public class MuaHang extends JFrame{
-//	private DangNhap_GUI loginGUI = new DangNhap_GUI();
-//	private DangKy_GUI dangKyGUI = new DangKy_GUI();
-	private TrangChu_GUI trangChuGUI;
-	private GioHang_GUI gioHangGUI = new GioHang_GUI();
+	private KhachHang khachHang;
+	private boolean isPrimary = false;
+	public TrangChu_GUI trangChuGUI = new TrangChu_GUI();;
+	public GioHang_GUI gioHangGUI = new GioHang_GUI();
 //	private QuanLy_GUI quanLyGUI = new QuanLy_GUI();
 	private TroGiup_GUI troGiupGUI = new TroGiup_GUI();
 	
 	private JPanel contentPane = new JPanel();
 	
+	public static void main(String[] args) throws SQLException {
+		MuaHang muaHangGUI = new MuaHang();
+		muaHangGUI.setVisible(true);
+	}
+	
 	public MuaHang() throws SQLException {
-		
-		trangChuGUI = new TrangChu_GUI();
+		this.khachHang = new KhachHangDAO().getKhachHang(1);
+		trangChuGUI.setKhachHang(khachHang);
+		gioHangGUI.setKhachHang(khachHang);
 		renderGUI();
 	}
 	
 	public MuaHang(KhachHang khachHang) throws SQLException {
+		this.khachHang = khachHang;
 		trangChuGUI = new TrangChu_GUI(khachHang);
+		gioHangGUI = new GioHang_GUI(khachHang);
 		renderGUI();
 	}
 	
-	public void renderGUI() {
+	public MuaHang(KhachHang khachHang, boolean isPrimary) throws SQLException {
+		this.khachHang = khachHang;
+		trangChuGUI = new TrangChu_GUI(khachHang);
+		gioHangGUI = new GioHang_GUI(khachHang);
+		renderGUI();
+		this.isPrimary = isPrimary;
+		if(isPrimary) {
+			setDefaultCloseOperation(EXIT_ON_CLOSE);
+		}
+	}
+	
+	public void renderGUI() throws SQLException {
 		
 		this.setTitle("Hiệu sách");
 		
@@ -48,6 +70,7 @@ public class MuaHang extends JFrame{
 			
 		//		
 		this.renderMain(trangChuGUI.getContentPane(), "trangchu");
+		trangChuGUI.renderData();
 //		contentPane
 		handleMenu();
 		handleGioHang();
@@ -59,9 +82,7 @@ public class MuaHang extends JFrame{
         this.repaint();
 //        this.contentPane = contentPane;
 //        this.add(this.contentPane);
-        this.setContentPane(contentPane);
-        this.revalidate();
-        this.repaint();
+        
         
         System.out.println("-> "+tab);
 //		if(tab.equals("dangnhap")) {
@@ -73,8 +94,7 @@ public class MuaHang extends JFrame{
 		if(tab.equals("trangchu")) {
 			
 		}else if(tab.equals("giohang")) {
-//			handleMenu();
-			
+			gioHangGUI.renderData();
 		}
 //		else if(tab.equals("quanly")) {
 //			handleQuanLy();
@@ -83,6 +103,9 @@ public class MuaHang extends JFrame{
 			handleTroGiup();
 		}
 		
+		this.setContentPane(contentPane);
+        this.revalidate();
+        this.repaint();
 	}
 	
 	public void handleMenu() {
@@ -91,6 +114,16 @@ public class MuaHang extends JFrame{
 				renderMain(gioHangGUI.getContentPane(), "giohang");
 			}
 		});
+		trangChuGUI.mntmThoat.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(isPrimary == false)
+					setVisible(false);
+				else
+					System.exit(0);
+			}
+		});
+		
+		
 		trangChuGUI.lblHelp.addMouseListener(new MouseListener() {
 
 			@Override
@@ -124,17 +157,50 @@ public class MuaHang extends JFrame{
 	}
 	
 	public void handleGioHang() {
-//		gioHangGUI.btnTroVe.addActionListener(new ActionListener() {
-//			public void actionPerformed(ActionEvent e) {
-//				renderMain(trangChuGUI.getContentPane(), "trangchu");
-//			}
-//		});
-		
-		gioHangGUI.mntmGioHang.addActionListener(new ActionListener() {
+		gioHangGUI.btnTroVe.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				renderMain(gioHangGUI.getContentPane(), "giohang");
+				renderMain(trangChuGUI.getContentPane(), "trangchu");
 			}
 		});
+		gioHangGUI.mntmThoat.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(isPrimary == false)
+					setVisible(false);
+				else
+					System.exit(0);
+			}
+		});
+		gioHangGUI.btnDatHang.addActionListener(new ActionListener() {
+			
+			
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				int choose = JOptionPane.showConfirmDialog(contentPane, "Xác nhận đặt hàng ?");
+				if(choose != 0) {
+					return;
+				}
+				
+				try {
+					DonDatHangDAO donDatHangDao = new DonDatHangDAO();
+					if(donDatHangDao.xacNhanDatHang(khachHang.getMaKh())) {
+						JOptionPane.showMessageDialog(contentPane, "Đặt hàng thành công");
+						renderMain(trangChuGUI.getContentPane(), "trangchu");
+					}else {
+						JOptionPane.showMessageDialog(contentPane, donDatHangDao.getError());
+					}
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
+				
+			}
+		});
+		
+//		gioHangGUI.mntmGioHang.addActionListener(new ActionListener() {
+//			public void actionPerformed(ActionEvent e) {
+//				renderMain(gioHangGUI.getContentPane(), "giohang");
+//			}
+//		});
 		
 		gioHangGUI.lblHelp.addMouseListener(new MouseListener() {
 
@@ -158,36 +224,29 @@ public class MuaHang extends JFrame{
 		});
 	}
 	
-
-//	
-//	public void handleQuanLy() {
-//		quanLyGUI.addWindowListener(new WindowAdapter() {
-//	        //for closing
-//	        @Override
-//	        public void windowClosing(WindowEvent e) {
-//	            if(isVisible() == false) {
-//	            	System.exit(0);
-//	            }
-//	        }
-//	        //for closed
-//
-//	        @Override
-//	        public void windowClosed(WindowEvent e) {
-//	        }
-//	    });
-//	}
-	
-	
-	public static void main(String[] args) throws SQLException {
-		MuaHang quanLyHieuSach = new MuaHang();
-//		try{
-//            ConnectDB.getInstance().connect();
-//        }catch(SQLException e){
-//            e.printStackTrace();
-//        }
-//		KhachHangDAO khachHangDao = new KhachHangDAO();
-//		System.out.println("hello world");
-//		khachHangDao.getListKhachHang();
-		
+	public JPanel getContentPane() {
+		return contentPane;
 	}
+	
+	
+	
+	public KhachHang getKhachHang() {
+		return khachHang;
+	}
+
+	public void setKhachHang(KhachHang khachHang) {
+		this.khachHang = khachHang;
+		trangChuGUI.setKhachHang(khachHang);
+		gioHangGUI.setKhachHang(khachHang);
+	}
+
+	public boolean isPrimary() {
+		return isPrimary;
+	}
+
+	public void setPrimary(boolean isPrimary) {
+		this.isPrimary = isPrimary;
+	}
+
+	
 }

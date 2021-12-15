@@ -1,4 +1,4 @@
-package GUI;
+package gui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -6,6 +6,14 @@ import java.awt.EventQueue;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -14,7 +22,13 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 
+import dao.ChiTietDonDatHangDAO;
+import dao.DonDatHangDAO;
+import dao.KhachHangDAO;
+import entity.ChiTietDonDatHang;
+import entity.DonDatHang;
 import entity.KhachHang;
+import util.Currency;
 
 import java.awt.Component;
 import javax.swing.Box;
@@ -34,23 +48,33 @@ import java.awt.GridLayout;
 import java.awt.FlowLayout;
 import javax.swing.JTextField;
 import javax.swing.JButton;
+import javax.swing.ScrollPaneConstants;
 
 public class GioHang_GUI extends JFrame {
 
 	private KhachHang khachHang = null;
+	private DonDatHang donDatHang = null;
 	
 	private JPanel contentPane;
-	private JTextField textField;
 	private JTextField textField_1;
 	private int numberOfItem = 5;
 	public JMenuItem mntmQuanLy;
 	public JMenuItem mntmGioHang;
 	public JMenuItem mntmDangXuat;
 	public JLabel lblHelp;
-	private JTextField textField_2;
-	private JTextField textField_3;
-	private JTextField textField_4;
-	private JTextField textField_5;
+	private JTextField txtMaKH;
+	private JTextField txtTenKH;
+	private JTextField txtSoDienThoai;
+	private JTextField txtDiaChi;
+
+	protected JButton btnDatHang;
+
+	protected JButton btnTroVe;
+
+	private JPanel pnItems;
+	private JTextField txtTongTien;
+	private JMenu mnMenu;
+	public JMenuItem mntmThoat;
 	/**
 	 * Launch the application.
 	 */
@@ -58,6 +82,7 @@ public class GioHang_GUI extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
+					//KhachHang kh = new KhachHangDAO().getKhachHang(3);
 					GioHang_GUI frame = new GioHang_GUI();
 					frame.setVisible(true);
 				} catch (Exception e) {
@@ -69,15 +94,19 @@ public class GioHang_GUI extends JFrame {
 
 	/**
 	 * Create the frame.
+	 * @throws SQLException 
 	 */
-	public GioHang_GUI() {
+	public GioHang_GUI() throws SQLException {
+		this.khachHang = new KhachHangDAO().getKhachHang(1);
 		GUI();
+		renderData();
 	}
 	
 	public GioHang_GUI(KhachHang khachHang) {
 		this.khachHang = khachHang;
 		GUI();
 	}
+	
 	
 	public void GUI() {
 //		Giỏ hàng
@@ -107,94 +136,107 @@ public class GioHang_GUI extends JFrame {
 		Component horizontalStrut = Box.createHorizontalStrut(30);
 		panelContent.add(horizontalStrut);
 		
-		JPanel panel_3 = new JPanel();
-		panel_3.setBorder(new EmptyBorder(50, 0, 0, 0));
-		panelContent.add(panel_3);
+		JPanel pnThongTinKhachHang = new JPanel();
+		pnThongTinKhachHang.setBorder(new EmptyBorder(50, 0, 0, 0));
+		panelContent.add(pnThongTinKhachHang);
 		
-		JPanel panel_4 = new JPanel();
-		panel_3.add(panel_4);
-		panel_4.setLayout(new BoxLayout(panel_4, BoxLayout.Y_AXIS));
+		JPanel boxThongTin = new JPanel();
+		pnThongTinKhachHang.add(boxThongTin);
+		boxThongTin.setLayout(new BoxLayout(boxThongTin, BoxLayout.Y_AXIS));
 		
-		JPanel panel_5 = new JPanel();
-		panel_4.add(panel_5);
+		JPanel pnThongTinKH = new JPanel();
+		boxThongTin.add(pnThongTinKH);
 		
-		JLabel lblNewLabel_5 = new JLabel("Thông tin khách hàng");
-		lblNewLabel_5.setFont(new Font("Tahoma", Font.PLAIN, 20));
-		panel_5.add(lblNewLabel_5);
+		JLabel lblThongTinKH = new JLabel("Thông tin khách hàng");
+		lblThongTinKH.setFont(new Font("Tahoma", Font.PLAIN, 20));
+		pnThongTinKH.add(lblThongTinKH);
 		
-		JPanel panel_6 = new JPanel();
-		FlowLayout flowLayout = (FlowLayout) panel_6.getLayout();
-		flowLayout.setAlignment(FlowLayout.LEFT);
-		panel_4.add(panel_6);
+		JPanel pnKH = new JPanel();
+		FlowLayout fl_pnKH = (FlowLayout) pnKH.getLayout();
+		fl_pnKH.setAlignment(FlowLayout.LEFT);
+		boxThongTin.add(pnKH);
 		
-		JLabel lblNewLabel_6 = new JLabel("Mã khách hàng");
-		lblNewLabel_6.setFont(new Font("Tahoma", Font.PLAIN, 15));
-		lblNewLabel_6.setPreferredSize(new Dimension(150, 20));
-		panel_6.add(lblNewLabel_6);
+		JLabel lblMaKH = new JLabel("Mã khách hàng");
+		lblMaKH.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		lblMaKH.setPreferredSize(new Dimension(150, 20));
+		pnKH.add(lblMaKH);
 		
-		textField_2 = new JTextField();
-		textField_2.setEditable(false);
-		textField_2.setPreferredSize(new Dimension(30, 20));
-		panel_6.add(textField_2);
-		textField_2.setColumns(20);
+		txtMaKH = new JTextField();
+		txtMaKH.setEditable(false);
+		txtMaKH.setPreferredSize(new Dimension(30, 20));
+		pnKH.add(txtMaKH);
+		txtMaKH.setColumns(20);
 		
-		JPanel panel_6_1 = new JPanel();
-		FlowLayout flowLayout_1 = (FlowLayout) panel_6_1.getLayout();
-		flowLayout_1.setAlignment(FlowLayout.LEFT);
-		panel_4.add(panel_6_1);
+		JPanel pnTenKH = new JPanel();
+		FlowLayout fl_pnTenKH = (FlowLayout) pnTenKH.getLayout();
+		fl_pnTenKH.setAlignment(FlowLayout.LEFT);
+		boxThongTin.add(pnTenKH);
 		
-		JLabel lblNewLabel_6_1 = new JLabel("Tên khách hàng");
-		lblNewLabel_6_1.setPreferredSize(new Dimension(150, 20));
-		lblNewLabel_6_1.setFont(new Font("Tahoma", Font.PLAIN, 15));
-		panel_6_1.add(lblNewLabel_6_1);
+		JLabel lblTenKH = new JLabel("Tên khách hàng");
+		lblTenKH.setPreferredSize(new Dimension(150, 20));
+		lblTenKH.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		pnTenKH.add(lblTenKH);
 		
-		textField_3 = new JTextField();
-		textField_3.setEditable(false);
-		textField_3.setColumns(20);
-		panel_6_1.add(textField_3);
+		txtTenKH = new JTextField(this.khachHang.getHoTen());
+		txtTenKH.setEditable(false);
+		txtTenKH.setColumns(20);
+		pnTenKH.add(txtTenKH);
 		
-		JPanel panel_6_1_1 = new JPanel();
-		FlowLayout flowLayout_2 = (FlowLayout) panel_6_1_1.getLayout();
-		flowLayout_2.setAlignment(FlowLayout.LEFT);
-		panel_4.add(panel_6_1_1);
+		JPanel pnSDT = new JPanel();
+		FlowLayout fl_pnSDT = (FlowLayout) pnSDT.getLayout();
+		fl_pnSDT.setAlignment(FlowLayout.LEFT);
+		boxThongTin.add(pnSDT);
 		
-		JLabel lblNewLabel_6_1_1 = new JLabel("Số điện thoại");
-		lblNewLabel_6_1_1.setPreferredSize(new Dimension(150, 20));
-		lblNewLabel_6_1_1.setFont(new Font("Tahoma", Font.PLAIN, 15));
-		panel_6_1_1.add(lblNewLabel_6_1_1);
+		JLabel lblSoDienThoai = new JLabel("Số điện thoại");
+		lblSoDienThoai.setPreferredSize(new Dimension(150, 20));
+		lblSoDienThoai.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		pnSDT.add(lblSoDienThoai);
 		
-		textField_4 = new JTextField();
-		textField_4.setEditable(false);
-		textField_4.setColumns(20);
-		panel_6_1_1.add(textField_4);
+		txtSoDienThoai = new JTextField(this.khachHang.getSoDienThoai());
+		txtSoDienThoai.setEditable(false);
+		txtSoDienThoai.setColumns(20);
+		pnSDT.add(txtSoDienThoai);
 		
-		JPanel panel_6_1_1_1 = new JPanel();
-		FlowLayout flowLayout_3 = (FlowLayout) panel_6_1_1_1.getLayout();
-		flowLayout_3.setAlignment(FlowLayout.LEFT);
-		panel_4.add(panel_6_1_1_1);
+		JPanel pnDiaChi = new JPanel();
+		FlowLayout fl_pnDiaChi = (FlowLayout) pnDiaChi.getLayout();
+		fl_pnDiaChi.setAlignment(FlowLayout.LEFT);
+		boxThongTin.add(pnDiaChi);
 		
-		JLabel lblNewLabel_6_1_1_1 = new JLabel("Địa chỉ");
-		lblNewLabel_6_1_1_1.setPreferredSize(new Dimension(150, 20));
-		lblNewLabel_6_1_1_1.setFont(new Font("Tahoma", Font.PLAIN, 15));
-		panel_6_1_1_1.add(lblNewLabel_6_1_1_1);
+		JLabel lblDiaChi = new JLabel("Địa chỉ");
+		lblDiaChi.setPreferredSize(new Dimension(150, 20));
+		lblDiaChi.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		pnDiaChi.add(lblDiaChi);
 		
-		textField_5 = new JTextField();
-		textField_5.setEditable(false);
-		textField_5.setColumns(20);
-		panel_6_1_1_1.add(textField_5);
+		txtDiaChi = new JTextField(this.khachHang.getDiaChi());
+		txtDiaChi.setEditable(false);
+		txtDiaChi.setColumns(20);
+		pnDiaChi.add(txtDiaChi);
+		
+		JPanel pnTongTien = new JPanel();
+		boxThongTin.add(pnTongTien);
+		
+		JLabel lblTongTien = new JLabel("Tổng tiền");
+		lblTongTien.setPreferredSize(new Dimension(150, 20));
+		lblTongTien.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		pnTongTien.add(lblTongTien);
+		
+		txtTongTien = new JTextField((String) null);
+		txtTongTien.setEditable(false);
+		txtTongTien.setColumns(20);
+		pnTongTien.add(txtTongTien);
 		
 		JPanel pnThongTin = new JPanel();
-		panel_4.add(pnThongTin);
+		boxThongTin.add(pnThongTin);
 		pnThongTin.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		
-		JButton btnDatHang = new JButton("Đặt hàng", null);
+		btnDatHang = new JButton("Đặt hàng", new ImageIcon("data/images/check2_16.png"));
 		btnDatHang.setPreferredSize(new Dimension(150, 30));
 		btnDatHang.setIconTextGap(8);
 		btnDatHang.setFont(new Font("Tahoma", Font.PLAIN, 15));
 		btnDatHang.setBackground(Color.WHITE);
 		pnThongTin.add(btnDatHang);
 		
-		JButton btnTroVe = new JButton("Tiếp tục mua hàng", null);
+		btnTroVe = new JButton("Tiếp tục mua hàng", new ImageIcon("data/images/carts (1).png"));
 		btnTroVe.setPreferredSize(new Dimension(200, 30));
 		btnTroVe.setIconTextGap(8);
 		btnTroVe.setFont(new Font("Tahoma", Font.PLAIN, 15));
@@ -205,31 +247,33 @@ public class GioHang_GUI extends JFrame {
 		panelContent.add(panel);
 		panel.setLayout(new BorderLayout(0, 0));
 
-		JLabel lblNewLabel = new JLabel("Giỏ hàng");
-		lblNewLabel.setBorder(new EmptyBorder(10, 0, 0, 0));
-		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 35));
-		lblNewLabel.setForeground(new Color(0, 206, 209));
-		panel.add(lblNewLabel, BorderLayout.NORTH);
+		JLabel lblGioHang = new JLabel("Giỏ hàng");
+		lblGioHang.setBorder(new EmptyBorder(10, 0, 0, 0));
+		lblGioHang.setHorizontalAlignment(SwingConstants.CENTER);
+		lblGioHang.setFont(new Font("Tahoma", Font.PLAIN, 35));
+		lblGioHang.setForeground(new Color(0, 206, 209));
+		panel.add(lblGioHang, BorderLayout.NORTH);
 		
-		JPanel panel_1 = new JPanel();
-		panel.add(panel_1, BorderLayout.CENTER);
-		panel_1.setLayout(new BoxLayout(panel_1, BoxLayout.Y_AXIS));
 		
-		JPanel panel_2 = new JPanel();
-		panel_2.setPreferredSize(new Dimension(10, -500 + numberOfItem*200));
-		panel_1.add(panel_2);
 		
-		JPanel pnItems = new JPanel();
-		panel_2.add(pnItems);
+		JPanel boxGioHang = new JPanel();
+//		panel.add(boxGioHang, BorderLayout.CENTER);
+		boxGioHang.setLayout(new BoxLayout(boxGioHang, BoxLayout.Y_AXIS));
+		JScrollPane scrollPane = new JScrollPane(boxGioHang);
+		scrollPane.getVerticalScrollBar().setUnitIncrement(20);
+		scrollPane.setPreferredSize(new Dimension(600, 500));
+		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		panel.add(scrollPane, BorderLayout.CENTER);
+		
+		JPanel pnGioHang = new JPanel();
+		boxGioHang.add(pnGioHang);
+		
+		pnItems = new JPanel();
+		pnGioHang.add(pnItems);
 		pnItems.setLayout(new GridLayout(0, 1, 0, 5));
 		
-		pnItems.add(this.itemGUI());
-		pnItems.add(this.itemGUI());
-		pnItems.add(this.itemGUI());
-		pnItems.add(this.itemGUI());
-		pnItems.add(this.itemGUI());
 		
+				
 
 		ImageIcon icon_dathang = new ImageIcon("data/images/shopping-cart32.png");
 		
@@ -241,6 +285,45 @@ public class GioHang_GUI extends JFrame {
 		contentPane.add(pane);
 	}
 	
+	public void renderData() {
+		txtMaKH.setText(String.valueOf(this.khachHang.getMaKh()));
+		txtTenKH.setText(this.khachHang.getHoTen());
+		txtDiaChi.setText(this.khachHang.getDiaChi());
+		txtSoDienThoai.setText(this.khachHang.getSoDienThoai());
+		txtTongTien.setText("0");
+		mnMenu.setText("Xin chào: "+this.khachHang.getHoTen());
+		pnItems.removeAll();
+		donDatHang = null;
+		try {
+			donDatHang = new DonDatHangDAO().getDonDatHang(this.khachHang.getMaKh());
+			if(donDatHang != null) {
+				ArrayList<ChiTietDonDatHang> chiTietDDH = donDatHang.getChiTietDonDatHangs();
+				if(chiTietDDH.size() == 0) {
+					btnDatHang.setEnabled(false);
+					pnItems.add(new JLabel("Không có sản phẩm nào trong giỏ hàng"));
+					
+					return;
+				}
+				btnDatHang.setEnabled(true);
+				AtomicReference<Double> tongTien = new AtomicReference<Double>(0.0);
+				chiTietDDH.forEach(chiTiet -> {
+					pnItems.add(this.itemGUI(chiTiet));
+					tongTien.set(tongTien.get() + chiTiet.getSoLuong()*chiTiet.getDonGia());
+				});
+				txtTongTien.setText(Currency.format(tongTien.get()));
+			}else {
+				btnDatHang.setEnabled(false);
+				pnItems.add(new JLabel("Không có sản phẩm nào trong giỏ hàng"));
+				
+			}
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+	
 	public JPanel headerGUI() {
 		JPanel panelHeader = new JPanel();
 		panelHeader.setBackground(new Color(255, 255, 255));
@@ -250,60 +333,54 @@ public class GioHang_GUI extends JFrame {
 		panel.setBackground(Color.WHITE);
 		panelHeader.add(panel);
 		
-		JLabel lblNewLabel_2 = new JLabel("Hiệu Sách NPB");
-		lblNewLabel_2.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 16));
-		lblNewLabel_2.setAlignmentX(1.0f);
-		panel.add(lblNewLabel_2);
+		JLabel lblLogo = new JLabel("Hiệu Sách NPB");
+		lblLogo.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 16));
+		lblLogo.setAlignmentX(1.0f);
+		panel.add(lblLogo);
 		
-		JPanel panel_1 = new JPanel();
-		panel_1.setBorder(null);
-		panel_1.setBackground(new Color(255, 255, 255));
-		panelHeader.add(panel_1);
-		panel_1.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-		
-		textField = new JTextField();
-		panel_1.add(textField);
-		textField.setColumns(20);
-		
-		JButton btnNewButton = new JButton("T\u00ECm ki\u1EBFm");
-		btnNewButton.setBackground(Color.WHITE);
-		btnNewButton.setPreferredSize(new Dimension(100, 19));
-		panel_1.add(btnNewButton);
+		JPanel pnTimKiem = new JPanel();
+		pnTimKiem.setBorder(null);
+		pnTimKiem.setBackground(new Color(255, 255, 255));
+		panelHeader.add(pnTimKiem);
+		pnTimKiem.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		
 		
 		
-		JPanel panel_3 = new JPanel();
-		panel_3.setAlignmentX(Component.LEFT_ALIGNMENT);
-		panel_3.setBackground(Color.WHITE);
-		panelHeader.add(panel_3);
+		JPanel pbMenu = new JPanel();
+		pbMenu.setAlignmentX(Component.LEFT_ALIGNMENT);
+		pbMenu.setBackground(Color.WHITE);
+		panelHeader.add(pbMenu);
 		
-		JPanel panel_2 = new JPanel();
-		panel_2.setBackground(Color.WHITE);
-		panel_3.add(panel_2);
+		JPanel pnTroGiup = new JPanel();
+		pnTroGiup.setBackground(Color.WHITE);
+		pbMenu.add(pnTroGiup);
 		
 		ImageIcon icon_help = new ImageIcon("data/images/question.png");
 		lblHelp = new JLabel("trợ giúp        ");
 		lblHelp.setIcon(icon_help);
-		panel_2.add(lblHelp);
+		pnTroGiup.add(lblHelp);
 		
 		JMenuBar menuBar = new JMenuBar();
 		menuBar.setBackground(Color.WHITE);
 		menuBar.setAlignmentX(Component.RIGHT_ALIGNMENT);
-		panel_3.add(menuBar);
+		pbMenu.add(menuBar);
 		
-		JMenu mnNewMenu = new JMenu("Xin chào: Trần Văn Nhân");
-		menuBar.add(mnNewMenu);
+		mnMenu = new JMenu("Xin chào: Trần Văn Nhân");
+		menuBar.add(mnMenu);
 		
 		mntmGioHang = new JMenuItem("Giỏ hàng");
-		mnNewMenu.add(mntmGioHang);
+		mnMenu.add(mntmGioHang);
 		
 		mntmDangXuat = new JMenuItem("Đăng xuất");
-		mnNewMenu.add(mntmDangXuat);
+		mnMenu.add(mntmDangXuat);
+		
+		mntmThoat = new JMenuItem("Thoát chương trình");
+		mnMenu.add(mntmThoat);
 		
 		return panelHeader;
 	}
 	
-	public JPanel itemGUI() {
+	public JPanel itemGUI(ChiTietDonDatHang chiTietDDH) {
 		JPanel pnItem = new JPanel();
 		pnItem.setPreferredSize(new Dimension(700, 100));
 		pnItem.setBackground(Color.WHITE);
@@ -317,7 +394,7 @@ public class GioHang_GUI extends JFrame {
 		JLabel lbIcon = new JLabel();
 		lbIcon.setAlignmentX(0.5f);
 		panel_2_1.add(lbIcon);
-		ImageIcon imageProduct = new ImageIcon("data/product/conan_tap_1.jpg");
+		ImageIcon imageProduct = new ImageIcon("data/product/default.png");
 		imageProduct = TrangChu_GUI.resizeIcon(imageProduct, new Dimension(150, 90));
 		lbIcon.setIcon(imageProduct);
 		
@@ -326,10 +403,12 @@ public class GioHang_GUI extends JFrame {
 		pnItem.add(panel_3);
 		panel_3.setLayout(new GridLayout(0, 1, 0, 0));
 		
-		JLabel lblNewLabel_1 = new JLabel("Conan - tập 1");
-		lblNewLabel_1.setFont(new Font("Tahoma", Font.PLAIN, 20));
-		lblNewLabel_1.setHorizontalAlignment(SwingConstants.LEFT);
-		panel_3.add(lblNewLabel_1);
+		JLabel lblTenSp = new JLabel(chiTietDDH.getSanPham().getTenSp());
+		lblTenSp.setFont(new Font("Tahoma", Font.PLAIN, 20));
+		lblTenSp.setHorizontalAlignment(SwingConstants.LEFT);
+		lblTenSp.setToolTipText(chiTietDDH.getSanPham().getTenSp());
+		panel_3.add(lblTenSp);
+		
 		
 		JPanel pnDonGia = new JPanel();
 		pnDonGia.setBackground(Color.WHITE);
@@ -340,7 +419,7 @@ public class GioHang_GUI extends JFrame {
 		lblDonGia.setBackground(Color.WHITE);
 		pnDonGia.add(lblDonGia);
 		
-		JLabel donGia = new JLabel("14.000đ");
+		JLabel donGia = new JLabel(Currency.format(chiTietDDH.getDonGia()));
 //		lblTongTien.setForeground(new Color(0, 206, 209));
 		donGia.setBackground(Color.WHITE);
 		pnDonGia.add(donGia);
@@ -353,10 +432,11 @@ public class GioHang_GUI extends JFrame {
 		JLabel lblNewLabel_3 = new JLabel("Số lượng:  ");
 		panel_1_1.add(lblNewLabel_3);
 		
-		textField = new JTextField();
-		textField.setText("1");
-		textField.setColumns(10);
-		panel_1_1.add(textField);
+		JTextField txtSoLuong = new JTextField();
+		txtSoLuong.setText(String.valueOf(chiTietDDH.getSoLuong()));
+		txtSoLuong.setColumns(10);
+		txtSoLuong.setEditable(false);
+		panel_1_1.add(txtSoLuong);
 		
 		JPanel panel_4 = new JPanel();
 		panel_4.setBackground(Color.WHITE);
@@ -367,7 +447,7 @@ public class GioHang_GUI extends JFrame {
 		lblNewLabel_4.setBackground(Color.WHITE);
 		panel_4.add(lblNewLabel_4);
 		
-		JLabel lblTongTien = new JLabel("14.000đ");
+		JLabel lblTongTien = new JLabel(Currency.format(chiTietDDH.getDonGia()*chiTietDDH.getSoLuong()));
 		lblTongTien.setForeground(new Color(0, 206, 209));
 		lblTongTien.setBackground(Color.WHITE);
 		panel_4.add(lblTongTien);
@@ -383,16 +463,56 @@ public class GioHang_GUI extends JFrame {
 
 
 		ImageIcon icon_delete = new ImageIcon("data/images/trash.png");
-		JButton btnNewButton = new JButton("Xóa", icon_delete);
-		btnNewButton.setBackground(Color.WHITE);
-		btnNewButton.setAlignmentY(Component.BOTTOM_ALIGNMENT);
-		btnNewButton.setHorizontalAlignment(SwingConstants.RIGHT);
-		panel_6.add(btnNewButton);
+		JButton btnXoa = new JButton("Xóa", icon_delete);
+		btnXoa.setBackground(Color.WHITE);
+		btnXoa.setAlignmentY(Component.BOTTOM_ALIGNMENT);
+		btnXoa.setHorizontalAlignment(SwingConstants.RIGHT);
+		panel_6.add(btnXoa);
+		
+		btnXoa.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				int choose = JOptionPane.showConfirmDialog(contentPane, "Chắc chắn xóa ?");
+				System.out.println(choose);
+				
+				if(choose == 0) {
+					try {
+						boolean kq = new ChiTietDonDatHangDAO().xoaChiTietDonDatHang(chiTietDDH.getSanPham().getMaSp(), donDatHang.getMaDDH());
+						if(kq == false) {
+							JOptionPane.showMessageDialog(contentPane, "Có lỗi xảy ra");
+							return;
+						}
+						
+						pnItems.remove(pnItem);
+						pnItems.revalidate();
+						pnItems.repaint();
+	//					pnItem.setVisible(false);
+					} catch (SQLException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+				
+			}
+		});
+		
 		
 		return pnItem;
 	}
 	
+	
 	public JPanel getContentPane() {
 		return this.contentPane;
 	}
+
+	public KhachHang getKhachHang() {
+		return khachHang;
+	}
+
+	public void setKhachHang(KhachHang khachHang) {
+		this.khachHang = khachHang;
+	}
+	
+	
 }

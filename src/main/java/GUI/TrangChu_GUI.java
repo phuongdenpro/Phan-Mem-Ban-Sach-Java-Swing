@@ -1,4 +1,4 @@
-package GUI;
+package gui;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
@@ -18,13 +18,14 @@ import javax.swing.SwingConstants;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.MatteBorder;
 
-import DAO.DonDatHangDao;
-import DAO.LoaiSanPhamDAO;
-import DAO.SanPhamDAO;
+import dao.DonDatHangDAO;
+import dao.LoaiSanPhamDAO;
+import dao.SanPhamDAO;
 import entity.KhachHang;
 import entity.LoaiSanPham;
 import entity.NhanVien;
 import entity.SanPham;
+import util.Currency;
 
 import java.awt.FlowLayout;
 import java.awt.GridBagLayout;
@@ -61,7 +62,6 @@ public class TrangChu_GUI extends JFrame {
 	private KhachHang khachHang = null;
 	
 	private JPanel contentPane;
-	private JTextField textField;
 	private JTextField textField_1;
 	private Container panelContent;
 
@@ -73,6 +73,12 @@ public class TrangChu_GUI extends JFrame {
 	
 	private LoaiSanPhamDAO loaiSPDao;
 	private ArrayList<LoaiSanPham> dslsp = new ArrayList<LoaiSanPham>();
+
+	private JMenu mnNewMenu;
+
+	public JMenuItem mntmThoat;
+
+	
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -87,8 +93,8 @@ public class TrangChu_GUI extends JFrame {
 		});
 	}
 
-	public TrangChu_GUI() {
-		
+	public TrangChu_GUI() throws SQLException {
+		GUI();
 	} 
 	
 	public TrangChu_GUI(KhachHang khachHang) throws SQLException {
@@ -125,20 +131,33 @@ public class TrangChu_GUI extends JFrame {
 		
 		
 		
-		loaiSPDao = new LoaiSanPhamDAO();
-		dslsp = loaiSPDao.getDanhSachLoaiSanPham();
-		
-		for(int i=0; i<dslsp.size(); i++) {
-			this.categoryGUI(dslsp.get(i));
-		}
-		
 		
 		
 	}
 	
-//	public void renderData() {
-//		
-//	}
+	public void renderData() throws SQLException {
+		panelContent.removeAll();
+		mnNewMenu.setText("Xin chào: "+this.khachHang.getHoTen());
+		loaiSPDao = new LoaiSanPhamDAO();
+		dslsp = loaiSPDao.getDanhSachLoaiSanPham();
+		
+		for(int i=0; i<dslsp.size(); i++) {
+//			if(dslsp.get(i).getSanPhams().size() != 0)
+			boolean flag = false;
+			LoaiSanPham loaiSanPham = dslsp.get(i);
+			ArrayList<SanPham> dsSanPham = loaiSanPham.getSanPhams();
+			for(int j=0; j<dsSanPham.size(); j++) {
+				if(dsSanPham.get(j).getSoLuong() != 0) {
+					flag = true;
+				}
+			}
+			if(flag)
+				this.categoryGUI(dslsp.get(i));
+		}
+		
+		panelContent.revalidate();
+		panelContent.repaint();
+	}
 
 	public JPanel headerGUI() {
 		JPanel panelHeader = new JPanel();
@@ -149,48 +168,39 @@ public class TrangChu_GUI extends JFrame {
 		panel.setBackground(Color.WHITE);
 		panelHeader.add(panel);
 		
-		JLabel lblNewLabel_2 = new JLabel("Hiệu Sách NPB");
-		lblNewLabel_2.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 16));
-		lblNewLabel_2.setAlignmentX(1.0f);
-		panel.add(lblNewLabel_2);
+		JLabel lblLogo = new JLabel("Hiệu Sách NPB");
+		lblLogo.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 16));
+		lblLogo.setAlignmentX(1.0f);
+		panel.add(lblLogo);
 		
-		JPanel panel_1 = new JPanel();
-		panel_1.setBorder(null);
-		panel_1.setBackground(new Color(255, 255, 255));
-		panelHeader.add(panel_1);
-		panel_1.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-		
-		textField = new JTextField();
-		panel_1.add(textField);
-		textField.setColumns(20);
-		
-		JButton btnNewButton = new JButton("T\u00ECm ki\u1EBFm");
-		btnNewButton.setBackground(Color.WHITE);
-		btnNewButton.setPreferredSize(new Dimension(100, 19));
-		panel_1.add(btnNewButton);
+		JPanel pnTimKiem = new JPanel();
+		pnTimKiem.setBorder(null);
+		pnTimKiem.setBackground(new Color(255, 255, 255));
+		panelHeader.add(pnTimKiem);
+		pnTimKiem.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		
 		
 		
-		JPanel panel_3 = new JPanel();
-		panel_3.setAlignmentX(Component.LEFT_ALIGNMENT);
-		panel_3.setBackground(Color.WHITE);
-		panelHeader.add(panel_3);
+		JPanel pnMenu = new JPanel();
+		pnMenu.setAlignmentX(Component.LEFT_ALIGNMENT);
+		pnMenu.setBackground(Color.WHITE);
+		panelHeader.add(pnMenu);
 		
-		JPanel panel_2 = new JPanel();
-		panel_2.setBackground(Color.WHITE);
-		panel_3.add(panel_2);
+		JPanel pnTroGiup = new JPanel();
+		pnTroGiup.setBackground(Color.WHITE);
+		pnMenu.add(pnTroGiup);
 		
 		ImageIcon icon_help = new ImageIcon("data/images/question.png");
 		lblHelp = new JLabel("trợ giúp        ");
 		lblHelp.setIcon(icon_help);
-		panel_2.add(lblHelp);
+		pnTroGiup.add(lblHelp);
 		
 		JMenuBar menuBar = new JMenuBar();
 		menuBar.setBackground(Color.WHITE);
 		menuBar.setAlignmentX(Component.RIGHT_ALIGNMENT);
-		panel_3.add(menuBar);
+		pnMenu.add(menuBar);
 		
-		JMenu mnNewMenu = new JMenu("Xin chào: Trần Văn Nhân");
+		mnNewMenu = new JMenu("Xin chào: Trần Văn Nhân");
 		menuBar.add(mnNewMenu);
 		
 		
@@ -199,6 +209,9 @@ public class TrangChu_GUI extends JFrame {
 		
 		mntmDangXuat = new JMenuItem("Đăng xuất");
 		mnNewMenu.add(mntmDangXuat);
+		
+		mntmThoat = new JMenuItem("Thoát chương trình");
+		mnNewMenu.add(mntmThoat);
 		
 		return panelHeader;
 	}
@@ -237,22 +250,30 @@ public class TrangChu_GUI extends JFrame {
 //		panel_9.setLayout(new GridLayout(0, 4));
 		ArrayList<SanPham> dsSanPham = loaiSanPham.getSanPhams();
 		for(int i=0; i<dsSanPham.size(); i++) {
-			panel_9.add(this.item(dsSanPham.get(i)));
+			if(dsSanPham.get(i).getSoLuong() != 0) {
+				if(loaiSanPham.getTenLoai().toLowerCase().contains("sách") || loaiSanPham.getTenLoai().toLowerCase().contains("truyện")) {
+					panel_9.add(this.item(dsSanPham.get(i), true));
+				}else {
+					panel_9.add(this.item(dsSanPham.get(i), false));
+				}
+			}
 		}
 		
 	}
 	
 
-	public JPanel item(SanPham sanPham) {
+	public JPanel item(SanPham sanPham, boolean isSach) {
 		JPanel pnItem = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
-//		pnItem.setBackground(color);
-//		pnItem.setSize(new Dimension(200, 300));
-		pnItem.setPreferredSize(new Dimension(200, 200));
+		if(!isSach)
+			pnItem.setPreferredSize(new Dimension(200, 220));
+		else
+			pnItem.setPreferredSize(new Dimension(200, 320));
 		pnItem.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		
 		JLabel lbIcon = new JLabel();
 		lbIcon.setAlignmentX(CENTER_ALIGNMENT);
 		lbIcon.setPreferredSize(new Dimension(200, 100));
+		
 		ImageIcon imageProduct = new ImageIcon("data/product/default.png");
 		imageProduct = TrangChu_GUI.resizeIcon(imageProduct, new Dimension(199, 100));
 		lbIcon.setIcon(imageProduct);
@@ -260,8 +281,13 @@ public class TrangChu_GUI extends JFrame {
 		
 		JPanel pnInfo = new JPanel();
 //		pnInfo.setLayout(new BoxLayout(pnInfo, BoxLayout.Y_AXIS));
-		pnInfo.setPreferredSize(new Dimension(190, 80));
-		pnInfo.setLayout(new GridLayout(3, 0));
+		if(!isSach) {
+			pnInfo.setPreferredSize(new Dimension(190, 100));
+			pnInfo.setLayout(new GridLayout(4, 0));
+		}else {
+			pnInfo.setPreferredSize(new Dimension(190, 200));
+			pnInfo.setLayout(new GridLayout(7, 0));
+		}
 		pnItem.add(pnInfo);
 		
 		JLabel lbTenSanPham = new JLabel(sanPham.getTenSp());
@@ -270,10 +296,25 @@ public class TrangChu_GUI extends JFrame {
 		lbTenSanPham.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 15));
 		pnInfo.add(lbTenSanPham);
 		
-		JLabel lbGia = new JLabel(String.valueOf(sanPham.getGiaSp()));
+		JLabel lbGia = new JLabel(Currency.format(sanPham.getGiaSp()).toString());
 		pnInfo.add(lbGia);
 		
-		JButton btnThemVaoGio = new JButton("Thêm vào giỏ");
+		JLabel lbSoLuong = new JLabel("Số lượng: " + sanPham.getSoLuong());
+		pnInfo.add(lbSoLuong);
+		
+		if(isSach) {
+			JLabel lbTacGia = new JLabel("Tác giả: " + sanPham.getTacGia());
+			pnInfo.add(lbTacGia);
+			
+			JLabel lbSoTrang = new JLabel("Số trang: " + sanPham.getSoTrang());
+			pnInfo.add(lbSoTrang);
+			
+			JLabel lbNamXuatBan = new JLabel("Năm xuất bản: " + sanPham.getNamXuatBan());
+			pnInfo.add(lbNamXuatBan);
+			
+		}
+		
+		JButton btnThemVaoGio = new JButton("Thêm vào giỏ", new ImageIcon("data/images/blueAdd_16.png"));
 		btnThemVaoGio.setBackground(Color.WHITE);
 		pnInfo.add(btnThemVaoGio);
 		
@@ -285,8 +326,16 @@ public class TrangChu_GUI extends JFrame {
 					return;
 				}
 				
+				if(soLuong > sanPham.getSoLuong()) {
+					JOptionPane.showMessageDialog(contentPane, sanPham.getTenSp()+" chỉ còn "+sanPham.getSoLuong()+" sản phẩm");
+					
+					return;
+				}
+				
 				try {
-					boolean kq = new DonDatHangDao().themSanPhamVaoDonDatHang(sanPham, soLuong, khachHang.getMaKh());
+					
+					
+					boolean kq = new DonDatHangDAO().themSanPhamVaoDonDatHang(sanPham, soLuong, khachHang.getMaKh());
 					if(kq) {
 						JOptionPane.showMessageDialog(contentPane, "Thêm vào giỏ thành công");
 					}else {
@@ -313,6 +362,10 @@ public class TrangChu_GUI extends JFrame {
 		return -1;
 	}
 	
+	public void showTimKiem() {
+		
+	}
+	
 	public static JPanel panelBackgroundImage(final String filepath) {
 		return new JPanel() {  
 			public void paintComponent(Graphics g) {  
@@ -333,4 +386,14 @@ public class TrangChu_GUI extends JFrame {
 	public JPanel getContentPane() {
 		return this.contentPane;
 	}
+
+	public KhachHang getKhachHang() {
+		return khachHang;
+	}
+
+	public void setKhachHang(KhachHang khachHang) {
+		this.khachHang = khachHang;
+	}
+	
+	
 }

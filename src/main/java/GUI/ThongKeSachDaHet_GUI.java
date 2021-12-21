@@ -12,6 +12,7 @@ import javax.swing.table.DefaultTableModel;
 import dao.SanPhamDAO;
 import entity.SanPham;
 import util.Currency;
+import util.Printer;
 
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
@@ -25,7 +26,7 @@ import java.awt.Font;
 import java.sql.SQLException;
 import java.util.List;
 
-public class ThongKeSachDaHet_GUI extends JFrame {
+public class ThongKeSachDaHet_GUI extends Printer {
 
 	private JPanel contentPane;
 	private List<SanPham> dssp;
@@ -108,8 +109,12 @@ public class ThongKeSachDaHet_GUI extends JFrame {
 		renderData();
 		
 		btnInBaoCao.addActionListener(e -> {
-			JOptionPane.showMessageDialog(contentPane, "In báo cáo thành công");
-			
+			panel_6.remove(btnInBaoCao);
+			printFrame();
+			JOptionPane.showMessageDialog(contentPane, "Đã hoàn tất tác vụ");
+			panel_6.add(btnInBaoCao);
+			panel_6.revalidate();
+			panel_6.repaint();
 		});
 	}
 	

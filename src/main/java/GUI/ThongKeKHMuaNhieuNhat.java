@@ -16,6 +16,7 @@ import util.Currency;
 import util.Ngay;
 import util.Pair;
 import util.Placeholder;
+import util.Printer;
 
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
@@ -39,7 +40,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import javax.swing.JComboBox;
 
-public class ThongKeKHMuaNhieuNhat extends JFrame {
+public class ThongKeKHMuaNhieuNhat extends Printer {
 
 	private int soLuongSP = 0;
 	
@@ -243,8 +244,18 @@ public class ThongKeKHMuaNhieuNhat extends JFrame {
 		renderData();
 		
 		btnInBaoCao.addActionListener(e -> {
-			JOptionPane.showMessageDialog(contentPane, "In báo cáo thành công");
-			
+			panel_6.remove(btnInBaoCao);
+			panel_2.remove(btnThongKe);
+			panel_2.remove(btnLamMoi);
+			printFrame();
+			JOptionPane.showMessageDialog(contentPane, "Đã hoàn tất tác vụ");
+			panel_6.add(btnInBaoCao);
+			panel_6.revalidate();
+			panel_6.repaint();
+			panel_2.add(btnThongKe);
+			panel_2.add(btnLamMoi);
+			panel_2.revalidate();
+			panel_2.repaint();
 		});
 	
 		btnThongKe.addActionListener((e) -> {

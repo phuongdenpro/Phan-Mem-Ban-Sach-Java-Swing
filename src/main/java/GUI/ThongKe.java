@@ -17,6 +17,7 @@ import util.Currency;
 import util.Ngay;
 import util.Pair;
 import util.Placeholder;
+import util.Printer;
 
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
@@ -47,7 +48,7 @@ import java.awt.FlowLayout;
 import javax.swing.border.MatteBorder;
 import java.awt.Component;
 
-public class ThongKe extends JFrame {
+public class ThongKe extends Printer {
 
 	private int soLuongSP = 0;
 	
@@ -304,7 +305,7 @@ public class ThongKe extends JFrame {
 		JPanel pnItem2 = new JPanel();
 		FlowLayout flowLayout_1 = (FlowLayout) pnItem2.getLayout();
 		flowLayout_1.setAlignment(FlowLayout.LEFT);
-		panel_4.add(pnItem2);
+//		panel_4.add(pnItem2);
 		
 		JLabel lblSKhchHng = new JLabel("Số khách hàng đã mua:");
 		lblSKhchHng.setPreferredSize(new Dimension(300, 30));
@@ -318,7 +319,7 @@ public class ThongKe extends JFrame {
 		JPanel pnItem3 = new JPanel();
 		FlowLayout flowLayout_2 = (FlowLayout) pnItem3.getLayout();
 		flowLayout_2.setAlignment(FlowLayout.LEFT);
-		panel_4.add(pnItem3);
+//		panel_4.add(pnItem3);
 		
 		JLabel lblSSnPhm = new JLabel("Số lượng sách bán được:");
 		lblSSnPhm.setPreferredSize(new Dimension(300, 30));
@@ -332,7 +333,7 @@ public class ThongKe extends JFrame {
 		JPanel pnItem3_1 = new JPanel();
 		FlowLayout flowLayout_3 = (FlowLayout) pnItem3_1.getLayout();
 		flowLayout_3.setAlignment(FlowLayout.LEFT);
-		panel_4.add(pnItem3_1);
+//		panel_4.add(pnItem3_1);
 		
 		JLabel lblSLngDng = new JLabel("Số lượng dụng cụ bán được:");
 		lblSLngDng.setPreferredSize(new Dimension(300, 30));
@@ -346,7 +347,7 @@ public class ThongKe extends JFrame {
 		JPanel pnItem4 = new JPanel();
 		FlowLayout flowLayout_4 = (FlowLayout) pnItem4.getLayout();
 		flowLayout_4.setAlignment(FlowLayout.LEFT);
-		panel_4.add(pnItem4);
+//		panel_4.add(pnItem4);
 		
 		JLabel lblDoanhThuNhn = new JLabel("Doanh thu nhận được:");
 		lblDoanhThuNhn.setPreferredSize(new Dimension(300, 30));
@@ -471,7 +472,14 @@ public class ThongKe extends JFrame {
 		});
 		
 		btnIn.addActionListener((e) -> {
-			JOptionPane.showMessageDialog(contentPane, "In báo cáo thành công");
+			panel_2.remove(btnIn);
+			panel_2.remove(btnThongKe);
+			printFrame();
+			JOptionPane.showMessageDialog(contentPane, "Đã hoàn tất tác vụ");
+			panel_2.add(btnIn);
+			panel_2.add(btnThongKe);
+			panel_2.revalidate();
+			panel_2.repaint();
 		});
 	}
 	

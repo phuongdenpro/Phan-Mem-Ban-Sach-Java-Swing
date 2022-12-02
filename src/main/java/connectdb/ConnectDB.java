@@ -9,7 +9,7 @@ public class ConnectDB {
         String severName = "localhost";
         String databaseName = "HieuSach";
         String username = "sa";
-        String password = "sapassword";
+        String password = "123456";
         String url = "jdbc:sqlserver://" + severName + ":1433;databaseName=" + databaseName;
         this.conn = DriverManager.getConnection(url, username, password);
         System.out.println(conn);
